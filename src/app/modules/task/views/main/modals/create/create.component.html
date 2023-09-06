@@ -1,0 +1,32 @@
+<div mat-dialog-content>
+    <mat-card class="elevation-none">
+        <mat-card-header>
+            <mat-card-title>
+                {{titleForm}}
+            </mat-card-title>
+        </mat-card-header>
+        <p>
+            <mat-divider></mat-divider>
+        </p>
+        <mat-card-content>
+            <form [formGroup]="taskForm">
+                <mat-form-field class="w-100">
+                    <mat-label>Title</mat-label>
+                    <input matInput formControlName="title">
+                </mat-form-field>
+
+                <mat-form-field class="w-100">
+                    <mat-label>Descriptión</mat-label>
+                    <textarea matInput formControlName="description"></textarea>
+                </mat-form-field>
+
+            </form>
+        </mat-card-content>
+    </mat-card>
+
+</div>
+<div mat-dialog-actions class="text-right">
+    <button mat-button (click)="onNoClick()">Close</button>
+    <button mat-button (click)="onSaveForm()" color="primary" [class.spinner]="loading"
+        [disabled]="taskForm.invalid || loading">Save</button>
+</div>
