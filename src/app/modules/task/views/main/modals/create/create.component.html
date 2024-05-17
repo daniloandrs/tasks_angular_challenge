@@ -1,32 +1,87 @@
-<div mat-dialog-content>
-    <mat-card class="elevation-none">
-        <mat-card-header>
-            <mat-card-title>
-                {{titleForm}}
-            </mat-card-title>
-        </mat-card-header>
-        <p>
-            <mat-divider></mat-divider>
-        </p>
-        <mat-card-content>
-            <form [formGroup]="taskForm">
-                <mat-form-field class="w-100">
-                    <mat-label>Title</mat-label>
-                    <input matInput formControlName="title">
+<h2 mat-dialog-title> {{titleForm}}</h2>
+<mat-dialog-content class="mat-typography">
+    <br />
+    <form [formGroup]="taskForm">
+
+        <div class="flex justify-between flex-2">
+            <div>
+                <mat-label>Prioridad</mat-label>
+                <br />
+                <mat-radio-group 
+                    aria-label="Selecciona la prioridad" 
+                    formControlName="priority"
+                    [color]="'primary'"
+                >
+                    <mat-radio-button 
+                        *ngFor="let priority of priorityList"
+                        [value]="priority"
+                        
+                    >
+                        {{priority}}
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div>
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Fecha de Vencimiento</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="expirationDate"> 
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
+            </div>
+        </div>
+        <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Titulo</mat-label>
+            <input matInput formControlName="title">
+        </mat-form-field>
 
-                <mat-form-field class="w-100">
-                    <mat-label>Descriptión</mat-label>
-                    <textarea matInput formControlName="description"></textarea>
-                </mat-form-field>
+        <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description"></textarea>
+        </mat-form-field>
 
-            </form>
-        </mat-card-content>
-    </mat-card>
+    </form>
+    <mat-label>Etiquetas</mat-label>
+    <div class="pa-4">
+        <button mat-button [matMenuTriggerFor]="menu">
+            <mat-icon>add</mat-icon>
+        </button>
+        <mat-menu 
+            #menu="matMenu"
+            yPosition="above"
+        >
+            <app-tag 
+                (click)="$event.stopPropagation()"
+                [(tags)]="tags"
+                (tagsChange)="changeTags($event)"
+            />
+        </mat-menu>
+    </div>
 
-</div>
-<div mat-dialog-actions class="text-right">
-    <button mat-button (click)="onNoClick()">Close</button>
-    <button mat-button (click)="onSaveForm()" color="primary" [class.spinner]="loading"
-        [disabled]="taskForm.invalid || loading">Save</button>
-</div>
+    <div style="width: 100%;display: block;overflow-y: scroll;">
+        <div class="flex flex-tags">
+            <div
+                *ngFor="let tag of tags"
+                class="tag-preview"
+                [ngStyle]="{ 'background-color': tag.color }"
+            >
+                {{tag.name }}
+            </div>
+        </div>
+    </div>
+
+    <br />
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()">
+        CERRAR<mat-icon>close</mat-icon>
+    </button>
+    <button mat-button 
+        (click)="onSaveForm()" 
+        color="primary" 
+        [class.spinner]="loading"
+        [disabled]="taskForm.invalid || loading"
+    >
+        GUARDAR <mat-icon>save</mat-icon>
+    </button>
+</mat-dialog-actions>

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import { TASK_STATUS, Task } from '../../models/task.model';
-import { TaskService } from '../../services/task.service';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Status, Tag, Task } from '../../models/task.model';
+import { TaskLocalService } from '../../services/task-local.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateComponent } from './modals/create/create.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Time } from '../../../../shared/utils/time';
+import { TagLocalService } from '../../services/tag-local.service';
 
 @Component({
   selector: 'app-task',
@@ -12,33 +13,41 @@ import { Time } from '../../../../shared/utils/time';
   styleUrls: ['./task.component.scss']
 })
 export class TaskComponent {
-  displayedColumns: string[] = ['position', 'title', 'description', 'status', 'date', 'actions'];
-  tasks!: Array<Task>;
 
-  public taskEnum = TASK_STATUS;
+  tasks!: Array<Task>;
+  tagsStored: Array<Tag> = [];
+  @ViewChild('endOfPage') endOfPage!: ElementRef;
 
   constructor(
-    private taskService: TaskService,
+    private taskLocalService: TaskLocalService,
     public dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private tagService: TagLocalService,
   ) { }
-  async ngOnInit() {
-    await this.getTasks();
+  ngOnInit() {
+     this.getTasks();
+     this.getTags();
   }
 
   openDialog(item: Task | null): void {
     const dialogRef = this.dialog.open(CreateComponent, {
       data: item,
-      height: '370px',
       width: '600px'
     });
 
-    dialogRef.componentInstance.itemAdded$.subscribe((result: {
-      isCreated: boolean,
-      item: Task
-    }) => {
-      if (result.isCreated) this.addTaskToList(result.item)
-      if (!result.isCreated) this.updateTaskToList(result.item)
+    dialogRef.componentInstance.itemAdded$.subscribe({
+      next : ( {
+        isCreated,item
+      }:{
+        isCreated: boolean,
+        item: Task
+      }) => {
+        this.getTasks()
+        if (isCreated) {
+          this.scrollToBottom()
+        }
+      },
+      
     })
   }
 
@@ -47,16 +56,17 @@ export class TaskComponent {
   }
 
   addTaskToList(task: Task) {
-    const newUsersArray = this.tasks;
-    newUsersArray.unshift(task);
-    this.tasks = [...newUsersArray];
+    const newTasksArray = this.tasks;
+    newTasksArray.unshift(task);
+    this.tasks = [...newTasksArray];
   }
 
   updateTaskToList(task: Task) {
-    const newUsersArray = this.tasks;
-    const findIndex = newUsersArray.findIndex(item => item.id === task.id)
-    if (findIndex > -1) newUsersArray[findIndex] = task;
-    this.tasks = [...newUsersArray];
+    this.taskLocalService.updateTask(task).subscribe({
+      complete:() => {
+        this.getTasks()
+      }
+    })
   }
 
   deleteTaskToList(task: Task) {
@@ -68,29 +78,76 @@ export class TaskComponent {
 
   async delete(element: Task) {
     try {
-      const { message, info } = await this.taskService.delete(element.id);
-      this.snackBar.open(message as string, 'success', { duration: 3000 });
-      this.deleteTaskToList(info)
+      this.taskLocalService.deleteTask(element.id).subscribe({
+        complete: () => {
+          this.snackBar.open('Tarea eliminada','success', { duration: 3000 });
+          this.getTasks()
+        }
+      });
     } catch (error) {
       this.snackBar.open((error as any).message as string, 'error', { duration: 3000 });
     }
   }
 
-  async markAsCompleted(element: Task) {
-    try {
-      const { message, info } = await this.taskService.markCompleted(element.id);
-      this.snackBar.open(message as string, 'success', { duration: 3000 });
-      this.updateTaskToList(info)
-    } catch (error) {
-      this.snackBar.open((error as any).message as string, 'error', { duration: 3000 });
+  toggleStatus (task:Task) {
+    const updtedTask = {
+      ...task,
+      status: task.status === Status.PENDING ? Status.COMPLETED : Status.PENDING
     }
+    this.updateTaskToList(updtedTask)
   }
 
-  async getTasks() {
-    this.tasks = await this.taskService.all()
+  getTagsPeerTask(keys:string[]) {
+    return this.tagsStored.filter(item => keys.includes(item.key))
   }
 
-  timeAgo(unixDate: number) {
-    return Time.timeAgo(unixDate)
+  getTags(): void {
+    this.tagService.getAllTags().subscribe({
+        next: tags =>{
+          this.tagsStored = tags
+        }
+    });
+  }
+
+  getTasks() {
+    this.taskLocalService.getAllTasks().subscribe({
+      next: tasks => this.tasks = tasks
+    });
+  }
+
+   expiredDate(dateString:string) {
+    const expiredDate = new Date(dateString);
+    const currentDate = new Date();
+    return expiredDate < currentDate;
+  }
+
+  colorStatus (status:Status,dateString:string) {
+    if (status === Status.EXPIRED || this.expiredDate(dateString)) {
+      return '#4BCE97';
+    }
+    else if (status === Status.PENDING) {
+      return '#F5CD47';
+    }
+    else if (status === Status.COMPLETED) {
+      return '#4BCE97';
+    }
+    
+    return "white";
+    
+  }
+
+  formatDate (string:string) {
+    return Time.format(string);
+  }
+
+  remainingTime(task:Task) {
+    if (task.status === Status.COMPLETED)
+        return "Esta tarea esta completada."
+    const unixTime = Date.parse(task.expirationDate);
+    return Time.remainingTime2(unixTime)
+  }
+
+  scrollToBottom(): void {
+    this.endOfPage.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
   }
 }

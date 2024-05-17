@@ -11,6 +11,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatNativeDateModule} from '@angular/material/core';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 const material = [
     MatToolbarModule,
@@ -24,11 +30,20 @@ const material = [
     MatFormFieldModule,
     MatDividerModule,
     MatSnackBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatRadioModule,
+    MatMenuModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatTooltipModule
 ];
 
 @NgModule({
     exports: [material],
-    imports: [material]
+    imports: [material],
+    providers: [
+        MatDatepickerModule
+    ],
 })
 export class MaterialModule { }

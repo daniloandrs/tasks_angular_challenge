@@ -1,11 +1,106 @@
-mat-card {
-    margin: 1rem 3rem ;
-    padding: 1rem 3rem;
+
+.app-container {
+    padding-top: 4rem;
 }
 
+mat-card.container-app {
+    margin: auto;
+    padding: 1rem 3rem;
+    max-width: 50rem;
+    overflow-y: auto;
+    box-shadow: none;
+}
 
 .btn-absolute {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
+    z-index: 2;
 }
+
+mat-card.task  {
+    margin: 1rem 2rem;
+    background-color: #22272B;
+    border-radius: .7rem;
+}
+
+mat-card-title.title,mat-card-content.content, mat-card-actions.actions, mat-card-footer.footer  {
+    color:white;
+}
+mat-card-header.header {
+    justify-content: space-between;
+}
+mat-card-title.title {
+    margin: 1rem .4rem;
+}
+mat-card-subtitle.subtitle {
+    display: flex !important;
+    justify-content: space-between !important;
+    width: 100%;
+}
+
+mat-card-content.content { 
+    margin: 1rem .4rem;
+}
+
+mat-card-actions.actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.tag {
+    width: 100%;
+    border-radius: 5px;
+    margin: 0rem .4rem;
+    padding: .2rem 1rem;
+    color: white;
+    font-weight: 500;
+}
+@media (min-width: 0px) and (max-width: 767px) {
+    mat-card.container-app {
+        width: 100%;
+        height: 100%;
+        padding: .2rem;
+    }
+
+    mat-card.task  {
+        padding: .1rem;
+        margin: 1rem 0rem;
+    }
+
+
+.btn-absolute {
+    bottom: 1rem;
+    right: 1rem;
+}
+    
+}
+    
+.circle-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    animation: pulse 1s infinite alternate; 
+  }
+  
+  .text {
+    margin-left: 10px;
+    font-size: 16px;
+    color: #4CAF50; 
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.1);
+    }
+  }

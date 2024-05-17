@@ -16,4 +16,66 @@ export class Time {
             return `Hace ${days} ${days === 1 ? 'día' : 'días'}`;
         }
     }
+
+    static format (stringDate:string) {
+        const date = new Date(stringDate);
+
+        const nombresMeses = [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+        ];
+
+        const day = date.getDate();
+        const month = nombresMeses[date.getMonth()];
+        const year = date.getFullYear() % 100;
+
+        return`${day} de ${month}`;
+    }
+
+    static remainingTime2(unixTimestampMillis:number)  {
+        const currentDate = new Date().getTime();
+        const diff = unixTimestampMillis - currentDate;
+      
+        if (diff <= 0) {
+          const pastTense = Math.abs(diff);
+          const seconds = Math.floor((pastTense / 1000) % 60);
+          const min = Math.floor((pastTense / (1000 * 60)) % 60);
+          const hours = Math.floor((pastTense / (1000 * 60 * 60)) % 24);
+          const days = Math.floor(pastTense / (1000 * 60 * 60 * 24));
+      
+          let messagePased = '';
+          if (days > 0) {
+            messagePased += `${days} día${days !== 1 ? 's' : ''}, `;
+          }
+          if (hours > 0) {
+            messagePased += `${hours} hora${hours !== 1 ? 's' : ''}, `;
+          }
+          if (min > 0) {
+            messagePased += `${min} minuto${min !== 1 ? 's' : ''}, `;
+          }
+          messagePased += `${seconds} segundo${seconds !== 1 ? 's' : ''}`;
+      
+          return `Expiro hace ${messagePased}`;
+        }
+      
+        const seconds = Math.floor((diff / 1000) % 60);
+        const min = Math.floor((diff / (1000 * 60)) % 60);
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      
+        let message = '';
+        if (days > 0) {
+          message += `${days} día${days !== 1 ? 's' : ''}, `;
+        }
+        if (hours > 0) {
+          message += `${hours} hora${hours !== 1 ? 's' : ''}, `;
+        }
+        if (min > 0) {
+          message += `${min} minuto${min !== 1 ? 's' : ''}, `;
+        }
+        message += `${seconds} segundo${seconds !== 1 ? 's' : ''}`;
+      
+        return `Expira en ${message}`;
+    }
+      
 }

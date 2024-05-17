@@ -4,7 +4,7 @@ import { TaskComponent } from './task/views/main/task.component';
 
 const routes: Routes = [
     {
-        path: 'tasks',
+        path: '',
         children: [
             {
                 path: '',
